@@ -1,5 +1,7 @@
 import warnings
 import collections as cl
+from pathlib import Path
+from urllib.parse import urlparse
 
 import cv2
 import exif
@@ -20,8 +22,13 @@ def itertuples(df):
         yield (i, Frame(*j))
 
 class ImageInfo:
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, source, target):
+        url = urlparse(source)
+        path = Path(url.path)
+        if path.is_absolute():
+            path = path.relative_to(path.root)
+
+        self.path = target.joinpath(path)
 
     def __str__(self):
         return str(self.path)
