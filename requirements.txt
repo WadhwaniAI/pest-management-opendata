@@ -1,0 +1,7 @@
+cv2
+detectron2
+exif
+geopandas
+pandas
+plum
+shapely
