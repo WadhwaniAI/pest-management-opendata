@@ -1,5 +1,3 @@
-# Reformatting
-
 It is unlikely the default data format is conducive for a modelling
 framework. This repository contains several scripts to convert the
 default format into another standard. This section details the
@@ -27,12 +25,12 @@ $> export PYTHONLOGLEVEL=info
 
 Or ignoring information completely by piping stderr to a file.
 
-## Detectron2
+# Detectron2
 
 [Detectron2](https://github.com/facebookresearch/detectron2) is an
 object detection framework maintained by Meta.
 
-### Basic usage
+## Basic usage
 
 ```
 $> ./bin/to-detectron2.sh -d data
@@ -51,7 +49,7 @@ $> ls data/metadata/
 $> ./bin/to-detectron2.sh -d data -v 20220629-1312
 ```
 
-### Advanced usage
+## Advanced usage
 
 For more advanced usage the Python generation script can be run
 directly. First, setup your environment:
@@ -71,7 +69,7 @@ $> zcat $ROOT/data/metadata/20220629-1312/dev.csv.gz | \
 		--split train > train.json
 ```
 
-### Inside the framework
+## Inside the framework
 
 The Detectron2 format manages labels using integers. They support a
 means for mapping those integers back to their human-readable
@@ -124,18 +122,18 @@ for i in sources.joinpath('data').iterdir():
     MetadataCatalog.get(i.stem).thing_classes = thing_classes()
 ```
 
-## Wadhwani AI
+# Wadhwani AI
 
 The object detection framework designed around this data is available
 from the Wadhwani Institute for Artificial Intelligence.
 
-### Basic usage
+## Basic usage
 
 ```bash
 $> ./bin/to-wadhwaniai.sh -d data > wadhwaniai.json
 ```
 
-### Advanced usage
+## Advanced usage
 
 For more advanced usage the Python generation script can be run
 directly. First, setup your environment:
@@ -155,12 +153,12 @@ $> python src/wadhwaniai_/build-output.py \
 	--source $ROOT/data/metadata/20220629-1312/test.csv.gz > wadhwaniai.json
 ```
 
-## MMDetection
+# MMDetection
 
 [MMDetection](https://github.com/open-mmlab/mmdetection) is an object
 detection framework developed by OpenMMLab.
 
-### Basic usage
+## Basic usage
 
 ```bash
 $> ./bin/to-mmdetection.sh -d data
@@ -170,7 +168,7 @@ This will create two JSON files corresponding to a train and a
 validation set. The location of those files is reported (to stdout) at
 the end of the scripts execution.
 
-### Advanced usage
+## Advanced usage
 
 For more advanced usage the Python generation script can be run
 directly. First, setup your environment:
