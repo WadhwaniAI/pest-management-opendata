@@ -6,7 +6,7 @@ import functools as ft
 import collections as cl
 from pathlib import Path
 from argparse import ArgumentParser
-from multiprocessing import Pool
+from multiprocessing import Pool, Queue
 
 import pandas as pd
 
@@ -36,6 +36,29 @@ class PestBoxes(BoxIterator):
             'category_id': self.categories[box.label],
             'bbox': bbox,
         }
+
+#
+#
+#
+Category = cl.namedtuple('Category', 'name, supercategory')
+
+class Categories:
+    _trap = 'is_trap'
+
+    def __init__(self, df):
+        self.categories = [
+            Category(self._trap, 'Image Level Categorical Label'),
+        ]
+        labels = df['label'].dropna().unique()
+        self.categories.extend(Category(x, 'bounding box') for x in labels)
+
+    def __iter__(self):
+        for (i, j) in enumerate(self.categories):
+            yield dict(j._asdict(), id=i)
+
+    def records(self):
+        for i in self:
+            yield (i['name'], i['id'])
 
 #
 #
@@ -73,91 +96,92 @@ class EntryCollection:
     def _(self, item: list, target):
         self.collection[target].extend(item)
 
-#
-#
-#
-Category = cl.namedtuple('Category', 'name, supercategory')
-
-class Categories:
-    _trap = 'is_trap'
-
-    def __init__(self, df):
-        self.categories = [
-            Category(self._trap, 'Image Level Categorical Label'),
-        ]
-        labels = df['label'].dropna().unique()
-        self.categories.extend(Category(x, 'bounding box') for x in labels)
+class EntryGenerator:
+    def __init__(self, args):
+        self.args = args
+        self._categories = None
 
     def __iter__(self):
-        for (i, j) in enumerate(self.categories):
-            yield dict(j._asdict(), id=i)
+        incoming = Queue()
+        outgoing = Queue()
+        initargs = (
+            outgoing,
+            incoming,
+            self.args,
+        )
 
-    def records(self):
-        for i in self:
-            yield (i['name'], i['id'])
+        with Pool(self.args.workers, self.func, initargs):
+            df = pd.concat(self.frames(), ignore_index=True)
+            self._categories = Categories(df)
+            cats = dict(self._categories.records())
 
-class MyImageInfo(ImageInfo):
-    def __init__(self, image, root=None):
-        if root is not None:
-            image = root.joinpath(image)
-        super().__init__(image)
+            groups = df.groupby('url', sort=False)
+            for i in groups:
+                outgoing.put((*i, cats))
+
+            for _ in range(groups.ngroups):
+                entry = incoming.get()
+                yield entry
+
+    def frames(self):
+        for i in self.args.source:
+            yield pd.read_csv(i, compression='gzip')
+
+    @property
+    def categories(self):
+        if self._categories is None:
+            raise AttributeError()
+
+        return list(self._categories)
+
+    @staticmethod
+    def func(incoming, outgoing, args):
+        while True:
+            (image, df, categories) = incoming.get()
+            Logger.info(image)
+
+            pests = PestBoxes(df, categories)
+            idx = int(pests)
+            box_annotations = list(pests)
+
+            info = ImageInfo(image, args.data_root)
+            images = {
+                'id': idx,
+                'file_path': str(info),
+                's3_url': image,
+                'date_captured': str(info.time()),
+            }
+            images.update(info.shape())
+
+            splits = {
+                'image_id': idx,
+                'split': df['split'].unique().item(),
+            }
+
+            caption_annotations = {
+                'id': idx,
+                'image_id': idx,
+                'category_id': categories[Categories._trap],
+                'caption': str(int(df['geometry'].notnull().all())),
+            }
+
+            entry = Entry(images, box_annotations, caption_annotations, splits)
+            outgoing.put(entry)
 
 #
 #
 #
-def func(args):
-    (image, df, categories) = args
-    Logger.info(image)
-
-    pests = PestBoxes(df, categories)
-    idx = int(pests)
-    box_annotations = list(pests)
-
-    info = MyImageInfo(image)
-    images = {
-        'id': idx,
-        'file_path': str(info),
-        's3_url': None,
-        'date_captured': str(info.time()),
-    }
-    images.update(info.shape())
-
-    splits = {
-        'image_id': idx,
-        'split': df['split'].unique().item(),
-    }
-
-    caption_annotations = {
-        'id': idx,
-        'image_id': idx,
-        'category_id': categories[Categories._trap],
-        'caption': str(int(df['geometry'].notnull().all())),
-    }
-
-    return Entry(images, box_annotations, caption_annotations, splits)
-
-def each(df, categories):
-    cats = dict(categories.records())
-    for (i, g) in df.groupby('path', sort=False):
-        if args.image_root is not None:
-            i = args.image_root.joinpath(i)
-        yield (i, g, cats)
-
 if __name__ == '__main__':
     arguments = ArgumentParser()
-    arguments.add_argument('--image-root', type=Path)
+    arguments.add_argument('--data-root', type=Path)
     arguments.add_argument('--source', type=Path, action='append')
     arguments.add_argument('--workers', type=int)
     args = arguments.parse_args()
 
-    with Pool(args.workers) as pool:
-        objs = (pd.read_csv(x, compression='gzip') for x in args.source)
-        df = pd.concat(objs, ignore_index=True)
-        categories = Categories(df)
-
-        ec = EntryCollection()
-        for i in pool.imap_unordered(func, each(df, categories)):
-            ec.update(i)
+    ec = EntryCollection()
+    eg = EntryGenerator(args)
+    for i in eg:
+        ec.update(i)
 
     info = {
         'version': str(uuid.uuid4()),
@@ -166,4 +190,4 @@ if __name__ == '__main__':
         'url': None,
         'date_created': str(pd.Timestamp.today()),
     }
-    ec.to_json(sys.stdout, info=info, categories=list(categories))
+    ec.to_json(sys.stdout, info=info, categories=eg.categories)
