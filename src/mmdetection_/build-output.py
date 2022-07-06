@@ -20,12 +20,12 @@ class PandasEncoder(json.JSONEncoder):
         return super().default(o)
 
     @default.register
-    def _(self, o: pd.DataFrame):
-        return o.to_numpy().tolist()
-
-    @default.register
     def _(self, o: pd.Series):
         return o.tolist()
+
+    @default.register
+    def _(self, o: pd.DataFrame):
+        return o.to_numpy().tolist()
 
 #
 #
