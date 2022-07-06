@@ -31,6 +31,8 @@ class PandasEncoder(json.JSONEncoder):
 #
 #
 def func(incoming, outgoing, args):
+    geom = 'geometry'
+
     while True:
         (image, df, categories) = incoming.get()
         Logger.info(image)
@@ -38,11 +40,11 @@ def func(incoming, outgoing, args):
         info = ImageInfo(image, args.data_root)
         record = dict(info.shape(), filename=str(info))
 
-        view = df.dropna(subset=['geometry'])
+        view = df.dropna(subset=[geom])
         if view.empty:
             ann = Ann([], [])
         else:
-            geometry = view['geometry'].apply(wkt.loads)
+            geometry = view[geom].apply(wkt.loads)
             gdf = GeoDataFrame(view, geometry=geometry)
             ann = Ann(
                 gdf.geometry.bounds,
