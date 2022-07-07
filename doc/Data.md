@@ -4,8 +4,14 @@ Data can be aquired using the [AWS CLI](https://aws.amazon.com/cli/):
 $> aws s3 sync --no-progress s3://wadhwaniai-agri-opendata/ data/
 ```
 
-Data consists of images, along with metadata that contains information
-about pest locations in those images.
+The data directory will consists of images, along with metadata
+(compressed CSVs) containing information about pest locations in those
+images.
+
+In AWS sync command, the target does not have to be `data`. This
+documentation assumes, however, that `data` was used. Please keep this
+in mind as you go through the documentation if you decide to deviate
+from this convention.
 
 # Images
 
