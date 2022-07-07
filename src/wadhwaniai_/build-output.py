@@ -1,6 +1,5 @@
 import sys
 import json
-import uuid
 import getpass
 import functools as ft
 import collections as cl
@@ -183,8 +182,9 @@ if __name__ == '__main__':
     for i in eg:
         ec.update(i)
 
+    version = '.'.join(x.parent.stem for x in args.source)
     info = {
-        'version': str(uuid.uuid4()),
+        'version': version,
         'description': 'Wadhwani AI pest management model input',
         'contributor': getpass.getuser(),
         'url': None,
