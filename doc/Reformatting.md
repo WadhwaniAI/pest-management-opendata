@@ -32,7 +32,7 @@ object detection framework maintained by Meta.
 
 ## Basic usage
 
-```
+```bash
 $> ./bin/to-detectron2.sh -d data
 ```
 
@@ -43,7 +43,7 @@ the end of the scripts execution.
 By default this will use the most recent metadata version. The version
 can be explicitly controlled using the `-v` option:
 
-```
+```bash
 $> ls data/metadata/
 20220629-1312
 $> ./bin/to-detectron2.sh -d data -v 20220629-1312
@@ -54,7 +54,7 @@ $> ./bin/to-detectron2.sh -d data -v 20220629-1312
 For more advanced usage the Python generation script can be run
 directly. First, setup your environment:
 
-```
+```bash
 $> ROOT=`git rev-parse --show-toplevel`
 $> export PYTHONPATH=$ROOT:$PYTHONPATH
 $> export PYTHONLOGLEVEL=info
@@ -138,7 +138,7 @@ $> ./bin/to-wadhwaniai.sh -d data > wadhwaniai.json
 For more advanced usage the Python generation script can be run
 directly. First, setup your environment:
 
-```
+```bash
 $> ROOT=`git rev-parse --show-toplevel`
 $> export PYTHONPATH=$ROOT:$PYTHONPATH
 $> export PYTHONLOGLEVEL=info
@@ -173,7 +173,7 @@ the end of the scripts execution.
 For more advanced usage the Python generation script can be run
 directly. First, setup your environment:
 
-```
+```bash
 $> ROOT=`git rev-parse --show-toplevel`
 $> export PYTHONPATH=$ROOT:$PYTHONPATH
 $> export PYTHONLOGLEVEL=info

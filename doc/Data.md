@@ -8,7 +8,7 @@ The data directory will consists of images, along with metadata
 (compressed CSVs) containing information about pest locations in those
 images.
 
-In AWS sync command, the target does not have to be `data`. This
+In the AWS sync command, the target does not have to be `data`. This
 documentation assumes, however, that `data` was used. Please keep this
 in mind as you go through the documentation if you decide to deviate
 from this convention.
