@@ -20,6 +20,14 @@ mobile application during actual app deployments. This means the
 images come with a range of characteristics, both with respect to the
 number of pests they contain, and to their contents overall.
 
+Image EXIF information has been generated using
+[ExifTool](https://exiftool.org/). Aside from the default values it
+generates, EXIF info in this data set includes:
+
+* Date the image was captured ("DateTimeOriginal")
+* Copyright ("Copyright")
+* Image license ("UserComment")
+
 # Metadata
 
 Images meant for both model development and model testing are present
@@ -51,52 +59,59 @@ under version 20220629-1312.
 
 ### Overview
 
-The CSV files are GZIP'd, containing one line per pest (box). The
-files are structured as follows:
+The CSV files are GZIP'd, containing one line per bounding box
+(pest). The files are structured as follows:
 
-| Header | Present in "dev" | Present in "test" | Description
+| Header | In "dev" | In "test" | Description
 |---     | ---   | ---    | ---
-| path | Yes | Yes | Path to the image file assuming the current working directory is `data`
-| split | Yes | Yes | Split for which the image is meant; values include `train`, `validation`, or `test`
-| label | Yes | No | The pest contained in this box; values include `abw` or `pbw`
+| url | Yes | Yes | S3 URL of the image
+| split | Yes | Yes | Split for which the image is meant
+| label | Yes | No | The pest contained in this box
 | geometry | Yes | No | The bounding box of the pest, as [WKT](https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry)
+
+Some rows in the dev CSV contain empty label and geometry
+values. These images come from user user submissions that did not
+contain pests.
 
 ### Manipulation
 
-The metadata format is designed to be minimal. The only thing it
-assumes about potential downstream pipelines are that bounding boxes
-and corresponding box labels are required. If, for example, training
-models based on pest counts instead of bounding boxes is required, the
-file can be easily manipulated:
+The metadata format is designed to be minimal. It only assumes that
+potential downstream pipelines require bounding boxes and
+corresponding box labels. Example of potential manipulations:
 
-```python
-import pandas as pd
+* __Information not in the metadata__: If additional information about
+  the image is required, the image can be read to obtain it:
 
-df = (pd
-      .read_csv('data/metadata/dev.csv.gz', compression='gzip')
-      .groupby(['path', 'label', 'split'], sort=False, dropna=False)['geometry']
-      .count()
-      .reset_index())
-```
+  ```python
+  import cv2
+  import pandas as pd
 
-If additional information about the image is required, the image can
-be read to obtain it:
+  def get_shapes(df):
+	  for i in df['path'].unique():
+		  img = cv2.imread(img, cv2.IMREAD_IGNORE_ORIENTATION)
+		  shape = zip(('height', 'width'), img.shape)
+		  yield dict(shape, path=i)
 
-```python
-import cv2
-import pandas as pd
+  df = pd.read_csv('data/metadata/dev.csv.gz', compression='gzip')
+  shapes = pd.DataFrame.from_records(get_shapes(df))
+  ```
 
-def get_shapes(df):
-    for i in df['path'].unique():
-        img = cv2.imread(img, cv2.IMREAD_IGNORE_ORIENTATION)
-        shape = zip(('height', 'width'), img.shape)
-        yield dict(shape, path=i)
+* __Pest counts__: To train models based on pest counts instead of
+  bounding boxes, the file can be manipulated as follows:
 
-df = pd.read_csv('data/metadata/dev.csv.gz', compression='gzip')
-shapes = pd.DataFrame.from_records(get_shapes(df))
-```
+  ```python
+  import pandas as pd
 
-This approach to formatting makes it unlikely that a modelling
-framework will be able to work with the files directly. For
+  df = (pd
+		.read_csv('data/metadata/dev.csv.gz', compression='gzip')
+		.groupby(['path', 'label', 'split'], sort=False, dropna=False)['geometry']
+		.count()
+		.reset_index())
+  ```
+
+This minimal approach to data formatting makes it unlikely that a
+modelling framework will be able to work with the files directly. For
 convenience, we provide scripts to go from our minimal format to other
-frameworks.
+frameworks. See our documentation on how to use those tools; pay
+attention to their source code (Python scripts in `src/`) for further
+guidance.
