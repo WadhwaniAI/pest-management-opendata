@@ -2,10 +2,10 @@ Welcome to the pest-management-opendata wiki!
 
 This wiki provides information about the:
 
-* projects purpose [[here|Home]],
-* structure of the data [[here|Data]],
-* format of the metadata (annotations) [[here|Data]], and
-* using scripts in this repository to convert the data [[here|Reformatting]].
+* projects purpose ([[here|Home]]),
+* structure of the data ([[here|Data]]),
+* format of the metadata (annotations) ([[here|Data]]), and
+* using scripts in this repository to convert the data ([[here|Reformatting]]).
 
 # Background
 
