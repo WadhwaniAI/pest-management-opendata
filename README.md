@@ -7,7 +7,7 @@ the institutes to help cotton farmers make better pest management
 decisions.
 
 In addition to providing documentation about the data, this repository
-also contains scripts to format the data for consumption by popular
+contains scripts to format the data for consumption by popular
 modelling frameworks.  Please see the
 [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki)
 for more information.
@@ -28,14 +28,16 @@ for more information.
 The data directory will house images along with compressed CSVs
 containing bounding box information for pests in those those
 images. Because of their format, it is unlikely that the CSVs are
-directly usable in popular modelling toolkits. Users are free to write
-their own parsers, or to use one of the parsers provided in this
-repository to convert the data. Details on the data format, and the
-conversion scripts, can be found in the wiki.
+directly usable by popular modelling toolkits. Users are free to write
+their own parsers to bridge that gap, or to use one of the parsers
+provided in this repository. Details on the data format, and the
+conversion scripts, can be found in the
+[wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki).
 
 # Questions, Comments, Issues
 
-If you notice anything awry with code, data, or documentation, please
-let us know! Issues and pull requests are welcome. You can also reach
-out through email:
+If something is not clear, or does not seem correct, please let us
+know! This goes for all aspects of this repository: code, data, and
+documentation. Issues and pull requests are welcome. You can also
+reach out through email:
 [agri-ai@wadhwaniai.org](mailto:agri-ai@wadhwaniai.org).
