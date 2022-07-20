@@ -40,10 +40,16 @@ designed contains the data used to train and test that model.
 
 Python scripts in this repository are known to work on Python
 3.8+. For library dependencies see the requrements.txt file at the top
-of this repository. Detectron2 has a non-standard [installation
-process](https://detectron2.readthedocs.io/en/latest/tutorials/install.html). If
-you do not intend to use that library for modelling, you can safetly
-ignore that requirement.
+of this repository.
+
+### Detectron2
+
+Detectron2 is required to run our conversion scripts related to its
+format. The library is not included in our requirements file because
+its installation of the library requires special handling. Please
+follow their [installation
+instructions](https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
+if working with our scripts is desired.
 
 ## Terminal
 

@@ -28,7 +28,8 @@ Or ignoring information completely by piping stderr to a file.
 # Detectron2
 
 [Detectron2](https://github.com/facebookresearch/detectron2) is an
-object detection framework maintained by Meta.
+object detection framework maintained by Meta. Installation of their
+library is required to run the scripts outlined in this section.
 
 ## Basic usage
 
