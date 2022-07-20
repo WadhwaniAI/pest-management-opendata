@@ -1,7 +1,9 @@
-cv2
 detectron2
 exif
 geopandas
+opencv-python
 pandas
 plum
 shapely
+torch>=1.8
+torchvision
