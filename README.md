@@ -8,7 +8,7 @@ decisions.
 
 In addition to providing documentation about the data, this repository
 contains scripts to format the data for consumption by popular
-modelling frameworks.  Please see the
+modelling frameworks. Please see the
 [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki)
 for more information.
 
@@ -26,12 +26,12 @@ for more information.
    ```
 
 The data directory will house images along with compressed CSVs
-containing bounding box information for pests in those those
-images. Because of their format, it is unlikely that the CSVs are
-directly usable by popular modelling toolkits. Users are free to write
-their own parsers to bridge that gap, or to use one of the parsers
-provided in this repository. Details on the data format, and the
-conversion scripts, can be found in the
+containing bounding box information for pests in those images. Because
+of their format, it is unlikely that the CSVs are directly usable by
+popular modelling toolkits. Users are free to write their own parsers
+to bridge that gap, or to use one of the parsers provided in this
+repository. Details on the data format, and the conversion scripts,
+can be found in the
 [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki).
 
 # Questions, Comments, Issues
