@@ -1,10 +1,10 @@
 # Wadhwani AI Pest Management Open Data
 
 This repository acts as a gateway to the Wadhwani Institute for
-Artificial Intelligence pest data set. The data set is primarily
-intended for training pest recognition models. Such models are used by
-the institutes to help cotton farmers make better pest management
-decisions.
+Artificial Intelligence (Wadhwani AI) pest data set. The data set is
+primarily intended for training pest recognition models. Such models
+are used by Wadhwani AI to help cotton farmers make better pest
+management decisions.
 
 In addition to providing documentation about the data, this repository
 contains scripts to format the data for consumption by popular
