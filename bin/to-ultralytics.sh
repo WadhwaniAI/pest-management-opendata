@@ -24,15 +24,17 @@ done
 if [ ! $_version ]; then
     _version=`ls -t $_data/metadata/ | head --lines=1`
 fi
-mkdir --parents $_output
 
+mkdir --parents $_output
 for i in $_data/metadata/$_version/*; do
     data=( ${data[@]} --metadata $i )
 done
+config=$_output/config.yaml
+
 python $ROOT/src/ultralytics_/build-config.py ${data[@]} \
-       --output-root $_output > $_output/config
+       --output-root $_output > $config
 python $ROOT/src/ultralytics_/build-output.py \
        --data-root $_data \
        --version $_version \
-       --yolo-config $_output/config \
+       --yolo-config $config \
        --output-root $_output
