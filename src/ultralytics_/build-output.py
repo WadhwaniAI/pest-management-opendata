@@ -3,8 +3,8 @@ from pathlib import Path
 from argparse import ArgumentParser
 from multiprocessing import Pool, JoinableQueue
 
-from yaml import BaseLoader, load
 import pandas as pd
+from yaml import BaseLoader, load
 from pybboxes import BoundingBox
 
 from lib import Logger, ImageInfo, BoxIterator
