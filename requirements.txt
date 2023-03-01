@@ -2,4 +2,5 @@ geopandas
 piexif
 opencv-python!=4.6.0.66
 pandas
+pybboxes
 shapely
