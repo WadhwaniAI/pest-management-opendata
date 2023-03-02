@@ -4,11 +4,6 @@ from argparse import ArgumentParser
 import yaml
 import pandas as pd
 
-def ipaths(df, root='images'):
-    for i in df['split'].unique():
-        path = Path(root, i)
-        yield (i, str(path))
-
 #
 #
 #
@@ -25,6 +20,6 @@ if __name__ == '__main__':
         'path': str(args.output_root),
         'names': dict(enumerate(sorted(labels))),
     }
-    config.update(ipaths(df))
+    config.update({x: f'{x}.txt' for x in df['split'].unique()})
 
     print(yaml.dump(config), end='')
