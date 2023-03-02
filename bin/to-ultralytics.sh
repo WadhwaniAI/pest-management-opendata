@@ -36,5 +36,4 @@ python $ROOT/src/ultralytics_/build-config.py ${data[@]} \
 python $ROOT/src/ultralytics_/build-output.py \
        --data-root $_data \
        --version $_version \
-       --yolo-config $config \
-       --output-root $_output
+       --yolo-config $config

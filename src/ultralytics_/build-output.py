@@ -1,13 +1,17 @@
 import csv
+import collections as cl
 from pathlib import Path
 from argparse import ArgumentParser
-from multiprocessing import Pool, JoinableQueue
+from multiprocessing import Pool, Queue
 
 import pandas as pd
 from yaml import BaseLoader, load
 from pybboxes import BoundingBox
 
 from lib import Logger, ImageInfo, BoxIterator
+
+Flow = cl.namedtuple('Flow', 'source, target')
+GroupKey = cl.namedtuple('GroupKey', 'url, split')
 
 class YoloBoxes(BoxIterator):
     _w_h = (
@@ -31,71 +35,79 @@ class YoloBoxes(BoxIterator):
 
         return record
 
-class TargetManager:
-    def __init__(self, root):
-        self.root = root
-
-    def create(self, *args):
-        path = self.root.joinpath(*args)
-        path.parent.mkdir(parents=True, exist_ok=True)
-
-        return path
-
 #
 #
 #
-def func(queue, args):
-    tm = TargetManager(args.output_root)
-    with args.yolo_config.open() as fp:
-        config = load(fp, BaseLoader)
-    categories = dict(map(reversed, config['names'].items()))
+def func(incoming, outgoing, categories, flow):
+    (_images, _labels) = ('images', 'labels')
+    for i in (_images, _labels):
+        flow.target.joinpath(i).mkdir(parents=True, exist_ok=True)
 
     while True:
-        (image, df) = queue.get()
-        Logger.info(image)
+        (key, df) = incoming.get()
+        Logger.info(' '.join(key))
 
-        info = ImageInfo(image, args.data_root)
-
-        split = df['split'].unique().item()
+        info = ImageInfo(key.url, flow.source)
         name = info.path.relative_to(info.path.parents[1])
-        target = Path(split, '-'.join(name.parts))
+        target = '-'.join(name.parts)
 
         # Add the image
-        tm.create('images', target).symlink_to(info.path)
+        path = flow.target.joinpath(_images, target)
+        path.symlink_to(info.path)
 
         # Create the labels
-        dst = tm.create('labels', target.with_suffix('.txt'))
+        dst = flow.target.joinpath(_labels, target).with_suffix('.txt')
         with dst.open('w') as fp:
             boxes = YoloBoxes(df, info, categories)
             writer = csv.writer(fp, delimiter=' ')
             writer.writerows(boxes)
 
-        queue.task_done()
+        outgoing.put(key._replace(url=path))
 
 #
 #
 #
+def frames(source, version):
+    path = source.joinpath('metadata', version)
+    for i in path.iterdir():
+        yield pd.read_csv(i, compression='gzip')
+
 if __name__ == '__main__':
     arguments = ArgumentParser()
     arguments.add_argument('--version')
     arguments.add_argument('--data-root', type=Path)
     arguments.add_argument('--yolo-config', type=Path)
-    arguments.add_argument('--output-root', type=Path)
     arguments.add_argument('--workers', type=int)
     args = arguments.parse_args()
 
-    queue = JoinableQueue()
+    with args.yolo_config.open() as fp:
+        config = load(fp, BaseLoader)
+    i_o = Flow(args.data_root, Path(config['path']))
+    categories = dict(map(reversed, config['names'].items()))
+
+    incoming = Queue()
+    outgoing = Queue()
     initargs = (
-        queue,
-        args,
+        outgoing,
+        incoming,
+        categories,
+        i_o,
     )
 
     with Pool(args.workers, func, initargs):
-        data = (args
-                .data_root
-                .joinpath('metadata', args.version)
-                .iterdir())
-        df = pd.concat(pd.read_csv(x, compression='gzip') for x in data)
-        for i in df.groupby('url', sort=False):
-            queue.put(i)
-        queue.join()
+        groups = (pd
+                  .concat(frames(i_o.source, args.version))
+                  .groupby(list(GroupKey._fields), sort=False))
+        for (i, g) in groups:
+            key = GroupKey(*i)
+            outgoing.put((key, g))
+
+        records = cl.defaultdict(list)
+        for _ in range(groups.ngroups):
+            key = incoming.get()
+            records[key.split].append(key.url)
+
+    for (k, v) in records.items():
+        output = i_o.target.joinpath(config[k])
+        with output.open('w') as fp:
+            print(*v, sep='\n', file=fp)
