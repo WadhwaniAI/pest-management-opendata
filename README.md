@@ -44,7 +44,7 @@ from datasets import load_dataset
 dataset = load_dataset('jerome-ai/pest-management-opendata', streaming=True)
 ```
 
-More information can be found in our wiki, and in the Hugging Face
+More information can be found in our [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki/HuggingFace), and in the Hugging Face
 [dataset
 repository](https://huggingface.co/datasets/jerome-ai/pest-management-opendata).
 
