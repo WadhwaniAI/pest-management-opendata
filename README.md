@@ -34,6 +34,20 @@ repository. Details on the data format, and the conversion scripts,
 can be found in the
 [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki).
 
+### Hugging Face
+
+The dataset is also accesible via Hugging Face
+[datasets](https://huggingface.co/docs/datasets):
+
+```python
+from datasets import load_dataset
+dataset = load_dataset('jerome-ai/pest-management-opendata', streaming=True)
+```
+
+More information can be found in our wiki, and in the Hugging Face
+[dataset
+repository](https://huggingface.co/datasets/jerome-ai/pest-management-opendata).
+
 # Questions, Comments, Issues
 
 If something is not clear, or does not seem correct, please let us
