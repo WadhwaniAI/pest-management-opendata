@@ -17,6 +17,6 @@ preferred-citation:
   - family-names: "Doshi"
     given-names: "Jigar"
   title: "BOLLWM: A real-world dataset for bollworm pest monitoring from cotton fields in India"
-  url: https://arxiv.org/abs/2304.00763
+  doi: 10.48550/arXiv.2304.00763
   year: 2023
   conference: Practical ML for Developing Countries Workshop at ICLR
