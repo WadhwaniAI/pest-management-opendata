@@ -41,7 +41,7 @@ The dataset is also accesible via Hugging Face
 
 ```python
 from datasets import load_dataset
-dataset = load_dataset('wadhwaniai/pest-management-opendata', streaming=True)
+dataset = load_dataset('wadhwani-ai/pest-management-opendata', streaming=True)
 ```
 
 More information can be found in our [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki/HuggingFace), and in the Hugging Face
