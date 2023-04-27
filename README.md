@@ -46,7 +46,7 @@ dataset = load_dataset('wadhwaniai/pest-management-opendata', streaming=True)
 
 More information can be found in our [wiki](https://github.com/WadhwaniAI/pest-management-opendata/wiki/HuggingFace), and in the Hugging Face
 [dataset
-repository](https://huggingface.co/datasets/jerome-ai/pest-management-opendata).
+repository](https://huggingface.co/datasets/wadhwani-ai/pest-management-opendata).
 
 # Questions, Comments, Issues
 
