@@ -22,7 +22,7 @@ for more information.
    ```bash
    $> git clone https://github.com/WadhwaniAI/pest-management-opendata.git
    $> cd pest-management-opendata
-   $> aws s3 sync --no-progress s3://wadhwaniai-agri-opendata/ data/
+   $> aws s3 sync --no-sign-request s3://wadhwaniai-agri-opendata/ data/
    ```
 
 The data directory will house images along with compressed CSVs
